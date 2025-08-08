@@ -2,6 +2,7 @@ package com.codegym.projectmodule5.entity;
 
 import com.codegym.projectmodule5.enums.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,11 +23,15 @@ public class User {
     @Column(nullable = false, unique = true, length = 32)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    private String email;
+
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 20)
     private String phone;
+
 
     @ManyToOne
     @JoinColumn(name = "role_id")
