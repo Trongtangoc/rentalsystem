@@ -24,8 +24,8 @@ repositories {
 }
 
 dependencies {
-    // MySQL Driver
-    implementation 'mysql:mysql-connector-java:8.0.33'
+    // MySQL Driver - Updated to use the new connector
+    implementation 'com.mysql:mysql-connector-j:9.3.0'
 
     // Web, JPA, Thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -34,6 +34,7 @@ dependencies {
 
     // Spring Security (đăng nhập, phân quyền)
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
@@ -51,8 +52,10 @@ dependencies {
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
 
+    // Optional: Swagger for API documentation (uncomment if needed)
+    // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+}
 
 tasks.named('test') {
     useJUnitPlatform()

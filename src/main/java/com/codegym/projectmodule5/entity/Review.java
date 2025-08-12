@@ -1,12 +1,13 @@
+// Updated Review.java with createdAt field
 package com.codegym.projectmodule5.entity;
 
-import com.codegym.projectmodule5.entity.House;
-import com.codegym.projectmodule5.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reviews")
@@ -22,6 +23,9 @@ public class Review {
     private int rating;
     private String comment;
 
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -29,4 +33,11 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "house_id")
     private House house;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }
