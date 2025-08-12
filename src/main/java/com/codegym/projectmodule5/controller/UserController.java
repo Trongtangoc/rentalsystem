@@ -1,3 +1,5 @@
+// Fixed UserController.java
+
 package com.codegym.projectmodule5.controller;
 
 import com.codegym.projectmodule5.dto.request.ChangePasswordRequest;
@@ -7,6 +9,7 @@ import com.codegym.projectmodule5.dto.response.UserInfoResponse;
 import com.codegym.projectmodule5.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -85,6 +89,25 @@ public class UserController {
             return ResponseEntity.ok(new ApiResponse(true, "User promoted to host successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage()));
+        }
+    }
+
+    // Fixed upgrade-to-host method - delegate to UserService
+    @PutMapping("/upgrade-to-host")
+    public ResponseEntity<ApiResponse> upgradeToHost(Authentication authentication) {
+        try {
+            log.info("User {} requesting upgrade to host", authentication.getName());
+
+            // Delegate to UserService instead of direct repository access
+            userService.upgradeCurrentUserToHost(authentication.getName());
+
+            return ResponseEntity.ok(new ApiResponse(true,
+                    "Successfully upgraded to Host! Please log out and log in again to access host features."));
+
+        } catch (Exception e) {
+            log.error("Error upgrading user to host: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, "Failed to upgrade to host: " + e.getMessage()));
         }
     }
 }

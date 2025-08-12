@@ -15,4 +15,6 @@ public interface UserService {
     List<UserInfoResponse> getAllUsers();
     void deleteUser(Long userId, String adminUsername);
     void promoteToHost(Long userId, String adminUsername);
+    void upgradeCurrentUserToHost(String username);
+
 }
