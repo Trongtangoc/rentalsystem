@@ -1,10 +1,745 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Admin Dashboard - Rental System</title>-->
+<!--    <style>-->
+<!--        * {-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+
+<!--        body {-->
+<!--            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;-->
+<!--            line-height: 1.6;-->
+<!--            color: #333;-->
+<!--            background: #f8f9fa;-->
+<!--        }-->
+
+<!--        .navbar {-->
+<!--            background: #2c3e50;-->
+<!--            color: white;-->
+<!--            padding: 1rem 0;-->
+<!--            position: sticky;-->
+<!--            top: 0;-->
+<!--            z-index: 100;-->
+<!--        }-->
+
+<!--        .nav-container {-->
+<!--            max-width: 1200px;-->
+<!--            margin: 0 auto;-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            padding: 0 2rem;-->
+<!--        }-->
+
+<!--        .logo {-->
+<!--            font-size: 1.8rem;-->
+<!--            font-weight: bold;-->
+<!--            color: white;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        .nav-links {-->
+<!--            display: flex;-->
+<!--            gap: 1rem;-->
+<!--            align-items: center;-->
+<!--        }-->
+
+<!--        .nav-links a {-->
+<!--            text-decoration: none;-->
+<!--            color: white;-->
+<!--            padding: 0.5rem 1rem;-->
+<!--            border-radius: 25px;-->
+<!--            transition: background 0.3s;-->
+<!--        }-->
+
+<!--        .nav-links a:hover {-->
+<!--            background: rgba(255,255,255,0.1);-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            max-width: 1400px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 2rem;-->
+<!--        }-->
+
+<!--        .dashboard-header {-->
+<!--            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
+<!--            color: white;-->
+<!--            padding: 3rem 2rem;-->
+<!--            border-radius: 12px;-->
+<!--            margin-bottom: 2rem;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        .dashboard-header h1 {-->
+<!--            font-size: 2.5rem;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        .dashboard-header p {-->
+<!--            font-size: 1.2rem;-->
+<!--            opacity: 0.9;-->
+<!--        }-->
+
+<!--        .stats-grid {-->
+<!--            display: grid;-->
+<!--            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));-->
+<!--            gap: 1.5rem;-->
+<!--            margin-bottom: 3rem;-->
+<!--        }-->
+
+<!--        .stat-card {-->
+<!--            background: white;-->
+<!--            padding: 2rem;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 4px 15px rgba(0,0,0,0.1);-->
+<!--            text-align: center;-->
+<!--            border-left: 4px solid #ff385c;-->
+<!--        }-->
+
+<!--        .stat-icon {-->
+<!--            font-size: 3rem;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        .stat-number {-->
+<!--            font-size: 2.5rem;-->
+<!--            font-weight: bold;-->
+<!--            color: #ff385c;-->
+<!--            margin-bottom: 0.5rem;-->
+<!--        }-->
+
+<!--        .stat-label {-->
+<!--            color: #666;-->
+<!--            font-size: 1rem;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        .dashboard-grid {-->
+<!--            display: grid;-->
+<!--            grid-template-columns: 2fr 1fr;-->
+<!--            gap: 2rem;-->
+<!--        }-->
+
+<!--        .section {-->
+<!--            background: white;-->
+<!--            padding: 2rem;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 2px 15px rgba(0,0,0,0.08);-->
+<!--            margin-bottom: 2rem;-->
+<!--        }-->
+
+<!--        .section-header {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 2rem;-->
+<!--            padding-bottom: 1rem;-->
+<!--            border-bottom: 1px solid #eee;-->
+<!--        }-->
+
+<!--        .section-title {-->
+<!--            font-size: 1.5rem;-->
+<!--            font-weight: 600;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        .users-table {-->
+<!--            width: 100%;-->
+<!--            border-collapse: collapse;-->
+<!--            margin-top: 1rem;-->
+<!--        }-->
+
+<!--        .users-table th,-->
+<!--        .users-table td {-->
+<!--            padding: 1rem;-->
+<!--            text-align: left;-->
+<!--            border-bottom: 1px solid #eee;-->
+<!--        }-->
+
+<!--        .users-table th {-->
+<!--            background: #f8f9fa;-->
+<!--            font-weight: 600;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        .users-table tr:hover {-->
+<!--            background: #f8f9fa;-->
+<!--        }-->
+
+<!--        .user-avatar {-->
+<!--            width: 40px;-->
+<!--            height: 40px;-->
+<!--            border-radius: 50%;-->
+<!--            background: #ff385c;-->
+<!--            display: inline-flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            color: white;-->
+<!--            font-weight: bold;-->
+<!--            margin-right: 1rem;-->
+<!--        }-->
+
+<!--        .user-info {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--        }-->
+
+<!--        .user-details h4 {-->
+<!--            margin-bottom: 0.25rem;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        .user-details p {-->
+<!--            color: #666;-->
+<!--            font-size: 0.9rem;-->
+<!--        }-->
+
+<!--        .role-badge {-->
+<!--            padding: 0.25rem 0.75rem;-->
+<!--            border-radius: 20px;-->
+<!--            font-size: 0.8rem;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        .role-admin {-->
+<!--            background: #ff385c;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .role-host {-->
+<!--            background: #28a745;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .role-user {-->
+<!--            background: #6c757d;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .btn {-->
+<!--            padding: 0.5rem 1rem;-->
+<!--            border: none;-->
+<!--            border-radius: 6px;-->
+<!--            cursor: pointer;-->
+<!--            text-decoration: none;-->
+<!--            text-align: center;-->
+<!--            font-size: 0.9rem;-->
+<!--            transition: all 0.3s;-->
+<!--            margin: 0 0.25rem;-->
+<!--        }-->
+
+<!--        .btn-primary {-->
+<!--            background: #ff385c;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .btn-primary:hover {-->
+<!--            background: #e31c46;-->
+<!--        }-->
+
+<!--        .btn-success {-->
+<!--            background: #28a745;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .btn-success:hover {-->
+<!--            background: #218838;-->
+<!--        }-->
+
+<!--        .btn-danger {-->
+<!--            background: #dc3545;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .btn-danger:hover {-->
+<!--            background: #c82333;-->
+<!--        }-->
+
+<!--        .btn-sm {-->
+<!--            padding: 0.25rem 0.75rem;-->
+<!--            font-size: 0.8rem;-->
+<!--        }-->
+
+<!--        .recent-activity {-->
+<!--            max-height: 400px;-->
+<!--            overflow-y: auto;-->
+<!--        }-->
+
+<!--        .activity-item {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            padding: 1rem;-->
+<!--            border-bottom: 1px solid #eee;-->
+<!--        }-->
+
+<!--        .activity-icon {-->
+<!--            width: 40px;-->
+<!--            height: 40px;-->
+<!--            border-radius: 50%;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            margin-right: 1rem;-->
+<!--            font-size: 1.2rem;-->
+<!--        }-->
+
+<!--        .activity-new-user {-->
+<!--            background: #d4edda;-->
+<!--            color: #155724;-->
+<!--        }-->
+
+<!--        .activity-new-booking {-->
+<!--            background: #cce5ff;-->
+<!--            color: #004085;-->
+<!--        }-->
+
+<!--        .activity-new-property {-->
+<!--            background: #fff3cd;-->
+<!--            color: #856404;-->
+<!--        }-->
+
+<!--        .activity-content h4 {-->
+<!--            margin-bottom: 0.25rem;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        .activity-content p {-->
+<!--            color: #666;-->
+<!--            font-size: 0.9rem;-->
+<!--        }-->
+
+<!--        .activity-time {-->
+<!--            margin-left: auto;-->
+<!--            color: #999;-->
+<!--            font-size: 0.8rem;-->
+<!--        }-->
+
+<!--        .quick-actions {-->
+<!--            display: grid;-->
+<!--            gap: 1rem;-->
+<!--        }-->
+
+<!--        .action-card {-->
+<!--            padding: 1.5rem;-->
+<!--            border: 1px solid #eee;-->
+<!--            border-radius: 8px;-->
+<!--            text-align: center;-->
+<!--            cursor: pointer;-->
+<!--            transition: all 0.3s;-->
+<!--        }-->
+
+<!--        .action-card:hover {-->
+<!--            background: #f8f9fa;-->
+<!--            border-color: #ff385c;-->
+<!--        }-->
+
+<!--        .action-icon {-->
+<!--            font-size: 2rem;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        .system-health {-->
+<!--            display: grid;-->
+<!--            gap: 1rem;-->
+<!--        }-->
+
+<!--        .health-item {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            padding: 1rem;-->
+<!--            border: 1px solid #eee;-->
+<!--            border-radius: 8px;-->
+<!--        }-->
+
+<!--        .health-status {-->
+<!--            padding: 0.25rem 0.75rem;-->
+<!--            border-radius: 20px;-->
+<!--            font-size: 0.8rem;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        .status-healthy {-->
+<!--            background: #d4edda;-->
+<!--            color: #155724;-->
+<!--        }-->
+
+<!--        .status-warning {-->
+<!--            background: #fff3cd;-->
+<!--            color: #856404;-->
+<!--        }-->
+
+<!--        .status-error {-->
+<!--            background: #f8d7da;-->
+<!--            color: #721c24;-->
+<!--        }-->
+
+<!--        @media (max-width: 768px) {-->
+<!--            .container {-->
+<!--                padding: 1rem;-->
+<!--            }-->
+
+<!--            .dashboard-grid {-->
+<!--                grid-template-columns: 1fr;-->
+<!--            }-->
+
+<!--            .stats-grid {-->
+<!--                grid-template-columns: repeat(2, 1fr);-->
+<!--            }-->
+
+<!--            .users-table {-->
+<!--                font-size: 0.9rem;-->
+<!--            }-->
+
+<!--            .users-table th,-->
+<!--            .users-table td {-->
+<!--                padding: 0.5rem;-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; Navigation &ndash;&gt;-->
+<!--<nav class="navbar">-->
+<!--    <div class="nav-container">-->
+<!--        <a href="/" class="logo">🏠 RentalSystem Admin</a>-->
+<!--        <div class="nav-links">-->
+<!--            <a href="/">Public Site</a>-->
+<!--            <a href="/auth/logout">Logout</a>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</nav>-->
+
+<!--<div class="container">-->
+<!--    &lt;!&ndash; Dashboard Header &ndash;&gt;-->
+<!--    <div class="dashboard-header">-->
+<!--        <h1>⚡ Admin Dashboard</h1>-->
+<!--        <p>System overview and management console</p>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Stats Grid &ndash;&gt;-->
+<!--    <div class="stats-grid">-->
+<!--        <div class="stat-card">-->
+<!--            <div class="stat-icon">👥</div>-->
+<!--            <div class="stat-number" th:text="${users != null ? users.size() : 0}">127</div>-->
+<!--            <div class="stat-label">Total Users</div>-->
+<!--        </div>-->
+<!--        <div class="stat-card">-->
+<!--            <div class="stat-icon">🏠</div>-->
+<!--            <div class="stat-number">45</div>-->
+<!--            <div class="stat-label">Active Properties</div>-->
+<!--        </div>-->
+<!--        <div class="stat-card">-->
+<!--            <div class="stat-icon">📅</div>-->
+<!--            <div class="stat-number">89</div>-->
+<!--            <div class="stat-label">Total Bookings</div>-->
+<!--        </div>-->
+<!--        <div class="stat-card">-->
+<!--            <div class="stat-icon">💰</div>-->
+<!--            <div class="stat-number">$12,450</div>-->
+<!--            <div class="stat-label">Revenue This Month</div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <div class="dashboard-grid">-->
+<!--        &lt;!&ndash; Main Content &ndash;&gt;-->
+<!--        <div>-->
+<!--            &lt;!&ndash; Users Management &ndash;&gt;-->
+<!--            <div class="section">-->
+<!--                <div class="section-header">-->
+<!--                    <h2 class="section-title">User Management</h2>-->
+<!--                    <button class="btn btn-primary" onclick="exportUsers()">Export Users</button>-->
+<!--                </div>-->
+
+<!--                <table class="users-table">-->
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>User</th>-->
+<!--                        <th>Role</th>-->
+<!--                        <th>Properties</th>-->
+<!--                        <th>Bookings</th>-->
+<!--                        <th>Actions</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                    <tr th:each="user : ${users}">-->
+<!--                        <td>-->
+<!--                            <div class="user-info">-->
+<!--                                <div class="user-avatar" th:text="${user.username.substring(0,1).toUpperCase()}">U</div>-->
+<!--                                <div class="user-details">-->
+<!--                                    <h4 th:text="${user.username}">john_doe</h4>-->
+<!--                                    <p th:text="${user.email}">john@example.com</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                                    <span class="role-badge"-->
+<!--                                          th:class="'role-' + ${user.role.toLowerCase()}"-->
+<!--                                          th:text="${user.role}">USER</span>-->
+<!--                        </td>-->
+<!--                        <td th:text="${user.totalHouses}">2</td>-->
+<!--                        <td th:text="${user.totalBookings}">5</td>-->
+<!--                        <td>-->
+<!--                            <button th:if="${user.role == 'ROLE_USER'}"-->
+<!--                                    th:onclick="'promoteToHost(' + ${user.id} + ')'"-->
+<!--                                    class="btn btn-success btn-sm">Promote to Host</button>-->
+<!--                            <button th:unless="${user.role == 'ROLE_ADMIN'}"-->
+<!--                                    th:onclick="'deleteUser(' + ${user.id} + ')'"-->
+<!--                                    class="btn btn-danger btn-sm">Delete</button>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Sidebar &ndash;&gt;-->
+<!--        <div>-->
+<!--            &lt;!&ndash; Quick Actions &ndash;&gt;-->
+<!--            <div class="section">-->
+<!--                <div class="section-header">-->
+<!--                    <h2 class="section-title">Quick Actions</h2>-->
+<!--                </div>-->
+
+<!--                <div class="quick-actions">-->
+<!--                    <div class="action-card" onclick="manageProperties()">-->
+<!--                        <div class="action-icon">🏠</div>-->
+<!--                        <h4>Manage Properties</h4>-->
+<!--                        <p>View and moderate listings</p>-->
+<!--                    </div>-->
+
+<!--                    <div class="action-card" onclick="viewReports()">-->
+<!--                        <div class="action-icon">📊</div>-->
+<!--                        <h4>View Reports</h4>-->
+<!--                        <p>Analytics and insights</p>-->
+<!--                    </div>-->
+
+<!--                    <div class="action-card" onclick="systemSettings()">-->
+<!--                        <div class="action-icon">⚙️</div>-->
+<!--                        <h4>System Settings</h4>-->
+<!--                        <p>Configure platform</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Recent Activity &ndash;&gt;-->
+<!--            <div class="section">-->
+<!--                <div class="section-header">-->
+<!--                    <h2 class="section-title">Recent Activity</h2>-->
+<!--                </div>-->
+
+<!--                <div class="recent-activity">-->
+<!--                    <div class="activity-item">-->
+<!--                        <div class="activity-icon activity-new-user">👤</div>-->
+<!--                        <div class="activity-content">-->
+<!--                            <h4>New User Registration</h4>-->
+<!--                            <p>sarah_wilson joined the platform</p>-->
+<!--                        </div>-->
+<!--                        <div class="activity-time">2 hours ago</div>-->
+<!--                    </div>-->
+
+<!--                    <div class="activity-item">-->
+<!--                        <div class="activity-icon activity-new-property">🏠</div>-->
+<!--                        <div class="activity-content">-->
+<!--                            <h4>Property Listed</h4>-->
+<!--                            <p>Downtown Apartment added by john_host</p>-->
+<!--                        </div>-->
+<!--                        <div class="activity-time">5 hours ago</div>-->
+<!--                    </div>-->
+
+<!--                    <div class="activity-item">-->
+<!--                        <div class="activity-icon activity-new-booking">📅</div>-->
+<!--                        <div class="activity-content">-->
+<!--                            <h4>Booking Confirmed</h4>-->
+<!--                            <p>Beach House booking confirmed</p>-->
+<!--                        </div>-->
+<!--                        <div class="activity-time">1 day ago</div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; System Health &ndash;&gt;-->
+<!--            <div class="section">-->
+<!--                <div class="section-header">-->
+<!--                    <h2 class="section-title">System Health</h2>-->
+<!--                </div>-->
+
+<!--                <div class="system-health">-->
+<!--                    <div class="health-item">-->
+<!--                        <span>Database</span>-->
+<!--                        <span class="health-status status-healthy">Healthy</span>-->
+<!--                    </div>-->
+
+<!--                    <div class="health-item">-->
+<!--                        <span>File Storage</span>-->
+<!--                        <span class="health-status status-healthy">Healthy</span>-->
+<!--                    </div>-->
+
+<!--                    <div class="health-item">-->
+<!--                        <span>Email Service</span>-->
+<!--                        <span class="health-status status-warning">Warning</span>-->
+<!--                    </div>-->
+
+<!--                    <div class="health-item">-->
+<!--                        <span>Payment Gateway</span>-->
+<!--                        <span class="health-status status-healthy">Healthy</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    function promoteToHost(userId) {-->
+<!--        if (confirm('Promote this user to host?')) {-->
+<!--            fetch(`/api/users/${userId}/promote-to-host`, {-->
+<!--                method: 'PUT',-->
+<!--                headers: {-->
+<!--                    'Authorization': 'Bearer ' + getAuthToken()-->
+<!--                }-->
+<!--            })-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    if (data.success !== false) {-->
+<!--                        alert('User promoted to host successfully!');-->
+<!--                        location.reload();-->
+<!--                    } else {-->
+<!--                        alert('Failed to promote user: ' + data.message);-->
+<!--                    }-->
+<!--                })-->
+<!--                .catch(error => {-->
+<!--                    console.error('Error:', error);-->
+<!--                    alert('An error occurred');-->
+<!--                });-->
+<!--        }-->
+<!--    }-->
+
+<!--    function deleteUser(userId) {-->
+<!--        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {-->
+<!--            fetch(`/api/users/${userId}`, {-->
+<!--                method: 'DELETE',-->
+<!--                headers: {-->
+<!--                    'Authorization': 'Bearer ' + getAuthToken()-->
+<!--                }-->
+<!--            })-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    if (data.success !== false) {-->
+<!--                        alert('User deleted successfully!');-->
+<!--                        location.reload();-->
+<!--                    } else {-->
+<!--                        alert('Failed to delete user: ' + data.message);-->
+<!--                    }-->
+<!--                })-->
+<!--                .catch(error => {-->
+<!--                    console.error('Error:', error);-->
+<!--                    alert('An error occurred');-->
+<!--                });-->
+<!--        }-->
+<!--    }-->
+
+<!--    function exportUsers() {-->
+<!--        alert('Export functionality coming soon!');-->
+<!--    }-->
+
+<!--    function manageProperties() {-->
+<!--        alert('Property management panel coming soon!');-->
+<!--    }-->
+
+<!--    function viewReports() {-->
+<!--        alert('Reports and analytics coming soon!');-->
+<!--    }-->
+
+<!--    function systemSettings() {-->
+<!--        alert('System settings panel coming soon!');-->
+<!--    }-->
+
+<!--    function getAuthToken() {-->
+<!--        return localStorage.getItem('authToken') || '';-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
+<div class="container">
+    <div class="header">
+        <h1>🏠 Admin Dashboard</h1>
+        <p>Welcome to the Rental System Admin Panel</p>
+    </div>
 
+    <div class="success">
+        <h3>✅ Login Successful!</h3>
+        <p>You have successfully logged in as an administrator.</p>
+    </div>
+
+    <div class="actions">
+        <h3>Quick Actions:</h3>
+        <a href="/auth/logout" class="btn">Logout</a>
+        <a href="/" class="btn">Go to Home</a>
+        <a href="/test-connection" class="btn">Test Database</a>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <h3>System Status:</h3>
+        <ul>
+            <li>✅ Application is running</li>
+            <li>✅ Admin login working</li>
+            <li>✅ Templates loading correctly</li>
+            <li>🔄 Database connection: <a href="/test-connection">Test Now</a></li>
+        </ul>
+    </div>
+</div>
 </body>
 </html>

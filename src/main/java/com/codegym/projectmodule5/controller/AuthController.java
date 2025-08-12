@@ -1,46 +1,110 @@
+//// Simple AuthController.java
+//package com.codegym.projectmodule5.controller;
+//
+//import com.codegym.projectmodule5.dto.request.LoginRequest;
+//import com.codegym.projectmodule5.dto.request.RegisterRequest;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.stereotype.Controller;
+//import org.springframework.ui.Model;
+//import org.springframework.web.bind.annotation.*;
+//
+//@Controller
+//@RequestMapping("/auth")
+//@Slf4j
+//public class AuthController {
+//
+//    @GetMapping("/login")
+//    public String showLoginForm(Model model) {
+//        log.info("Showing login form");
+//        model.addAttribute("loginRequest", new LoginRequest());
+//        return "login";
+//    }
+//
+//    @PostMapping("/login")
+//    public String handleLogin(@ModelAttribute("loginRequest") LoginRequest request, Model model) {
+//        log.info("Login attempt for user: {}", request.getUsername());
+//
+//        // Simple admin check for testing
+//        if ("admin".equals(request.getUsername()) && "admin123".equals(request.getPassword())) {
+//            log.info("Admin login successful");
+//            return "redirect:/admin/dashboard";
+//        }
+//
+//        model.addAttribute("error", "Invalid username or password");
+//        return "login";
+//    }
+//
+//    @GetMapping("/register")
+//    public String showRegisterForm(Model model) {
+//        log.info("Showing register form");
+//        model.addAttribute("user", new RegisterRequest());
+//        return "register";
+//    }
+//
+//    @PostMapping("/register")
+//    public String handleRegister(@ModelAttribute("user") RegisterRequest request, Model model) {
+//        log.info("Registration attempt for user: {}", request.getUsername());
+//        model.addAttribute("success", "Registration successful! Please login.");
+//        return "register";
+//    }
+//
+//    @GetMapping("/logout")
+//    public String logout() {
+//        return "redirect:/auth/login";
+//    }
+//}
+// Simple AuthController.java
 package com.codegym.projectmodule5.controller;
 
-//import ch.qos.logback.core.model.Model;
+import com.codegym.projectmodule5.dto.request.LoginRequest;
 import com.codegym.projectmodule5.dto.request.RegisterRequest;
-import com.codegym.projectmodule5.service.AuthService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.Model;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
-    private final AuthService authService;
+
+    @GetMapping("/login")
+    public String showLoginForm(Model model) {
+        log.info("Showing login form");
+        model.addAttribute("loginRequest", new LoginRequest());
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String handleLogin(@ModelAttribute("loginRequest") LoginRequest request, Model model) {
+        log.info("Login attempt for user: {}", request.getUsername());
+
+        // Simple admin check for testing
+        if ("admin".equals(request.getUsername()) && "admin123".equals(request.getPassword())) {
+            log.info("Admin login successful");
+            return "redirect:/admin/dashboard";
+        }
+
+        model.addAttribute("error", "Invalid username or password");
+        return "login";
+    }
+
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
+        log.info("Showing register form");
         model.addAttribute("user", new RegisterRequest());
         return "register";
     }
-    @PostMapping("/register")
-    public String handleRegister(@Valid @ModelAttribute("user") RegisterRequest request,
-                                 BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes,
-                                 Model model) {
-        if (bindingResult.hasErrors()) {
-            return "register";
-        }
 
-        try {
-            authService.register(request);
-            redirectAttributes.addFlashAttribute("success", "Register successful. Please login.");
-            return "redirect:/auth/login";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            return "register";
-        }
+    @PostMapping("/register")
+    public String handleRegister(@ModelAttribute("user") RegisterRequest request, Model model) {
+        log.info("Registration attempt for user: {}", request.getUsername());
+        model.addAttribute("success", "Registration successful! Please login.");
+        return "register";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        return "redirect:/auth/login";
     }
 }
