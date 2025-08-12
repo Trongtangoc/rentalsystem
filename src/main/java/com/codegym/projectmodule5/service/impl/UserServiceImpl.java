@@ -15,6 +15,7 @@ import com.codegym.projectmodule5.repository.UserRepository;
 import com.codegym.projectmodule5.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -162,7 +164,31 @@ public class UserServiceImpl implements UserService {
         user.setRole(hostRole);
         userRepository.save(user);
     }
+    @Override
+    public void upgradeCurrentUserToHost(String username) {
+        log.info("Upgrading user {} to host", username);
 
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Check if already host or admin
+        if (user.getRole().getName() == RoleEnum.ROLE_HOST) {
+            throw new CustomException("User is already a host");
+        }
+        if (user.getRole().getName() == RoleEnum.ROLE_ADMIN) {
+            throw new CustomException("Admin cannot be converted to host");
+        }
+
+        // Get HOST role
+        Role hostRole = roleRepository.findByName(RoleEnum.ROLE_HOST)
+                .orElseThrow(() -> new CustomException("Host role not found"));
+
+        // Update user role
+        user.setRole(hostRole);
+        userRepository.save(user);
+
+        log.info("User {} upgraded to HOST successfully", username);
+    }
     private UserInfoResponse convertToUserInfoResponse(User user) {
         int totalHouses = user.getHouses() != null ? user.getHouses().size() : 0;
         int totalBookings = user.getBookings() != null ? user.getBookings().size() : 0;
@@ -179,4 +205,5 @@ public class UserServiceImpl implements UserService {
                 .totalReviews(totalReviews)
                 .build();
     }
+
 }
