@@ -21,7 +21,12 @@ public class Notification {
     private Long id;
 
     private String message;
-    private LocalDateTime createdAt;
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    private boolean isRead = false;
 
     @Enumerated(EnumType.STRING)
     private NotificationType type;
@@ -29,4 +34,11 @@ public class Notification {
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

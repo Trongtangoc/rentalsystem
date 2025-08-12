@@ -1,10 +1,804 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${house.title} + ' - Rental System'">House Detail</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fafafa;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff385c;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            padding: 0.5rem 1rem;
+            margin-left: 1rem;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: #f7f7f7;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            margin-bottom: 1rem;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #ff385c;
+            text-decoration: none;
+        }
+
+        .house-header {
+            margin-bottom: 2rem;
+        }
+
+        .house-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .house-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .star {
+            color: #ffc107;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: 200px 200px;
+            gap: 0.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .main-image {
+            grid-row: 1 / 3;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #999;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-image {
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #999;
+        }
+
+        .gallery-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 4rem;
+        }
+
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .host-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+
+        .host-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ff385c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .host-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .host-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .property-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .feature-icon {
+            font-size: 1.2rem;
+        }
+
+        .description {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .description h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .amenities {
+            margin-bottom: 2rem;
+        }
+
+        .amenities h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .amenity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .booking-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            border: 1px solid #eee;
+        }
+
+        .price-display {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .price-per-night {
+            font-size: 1rem;
+            font-weight: normal;
+            color: #666;
+        }
+
+        .booking-form {
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="date"], input[type="number"], select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff385c;
+            box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.1);
+        }
+
+        .btn-book {
+            width: 100%;
+            background: #ff385c;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-book:hover {
+            background: #e31c46;
+        }
+
+        .price-breakdown {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .price-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .reviews-section {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            margin-top: 2rem;
+        }
+
+        .reviews-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .review-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #fafafa;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ff385c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .review-rating {
+            color: #ffc107;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-host {
+            width: 100%;
+            background: white;
+            color: #ff385c;
+            border: 1px solid #ff385c;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .contact-host:hover {
+            background: #ff385c;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .image-gallery {
+                grid-template-columns: 1fr;
+                grid-template-rows: 250px;
+            }
+
+            .content-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .property-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">🏠 RentalSystem</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/auth/login">Login</a>
+            <a href="/auth/register">Sign Up</a>
+        </div>
+    </div>
+</nav>
 
+<div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/">Home</a> / <span th:text="${house.title}">House Title</span>
+    </div>
+
+    <!-- House Header -->
+    <div class="house-header">
+        <h1 class="house-title" th:text="${house.title}">Beautiful Beach House</h1>
+        <div class="house-subtitle">
+            <div class="rating" th:if="${house.averageRating > 0}">
+                <span class="star">★</span>
+                <span th:text="${#numbers.formatDecimal(house.averageRating, 1, 1)}">4.5</span>
+                <span>([[${house.reviewCount}]] reviews)</span>
+            </div>
+            <span>•</span>
+            <span th:text="${house.address}">123 Beach Road, Miami</span>
+        </div>
+    </div>
+
+    <!-- Image Gallery -->
+    <div class="image-gallery">
+        <div class="main-image">
+            <img th:if="${house.imageUrls != null and !house.imageUrls.isEmpty()}"
+                 th:src="${house.imageUrls[0]}" th:alt="${house.title}">
+            <span th:unless="${house.imageUrls != null and !house.imageUrls.isEmpty()}">🏠</span>
+        </div>
+
+        <div class="gallery-image" th:if="${house.imageUrls != null and house.imageUrls.size() > 1}">
+            <img th:src="${house.imageUrls[1]}" th:alt="${house.title}">
+        </div>
+        <div class="gallery-image" th:unless="${house.imageUrls != null and house.imageUrls.size() > 1}">📷</div>
+
+        <div class="gallery-image" th:if="${house.imageUrls != null and house.imageUrls.size() > 2}">
+            <img th:src="${house.imageUrls[2]}" th:alt="${house.title}">
+        </div>
+        <div class="gallery-image" th:unless="${house.imageUrls != null and house.imageUrls.size() > 2}">📷</div>
+
+        <div class="gallery-image" th:if="${house.imageUrls != null and house.imageUrls.size() > 3}">
+            <img th:src="${house.imageUrls[3]}" th:alt="${house.title}">
+        </div>
+        <div class="gallery-image" th:unless="${house.imageUrls != null and house.imageUrls.size() > 3}">📷</div>
+    </div>
+
+    <!-- Content Layout -->
+    <div class="content-layout">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Host Info -->
+            <div class="host-info">
+                <div class="host-avatar" th:text="${house.ownerName != null ? house.ownerName.substring(0,1).toUpperCase() : 'H'}">H</div>
+                <div class="host-details">
+                    <h3>Hosted by <span th:text="${house.ownerName ?: 'Host'}">Host</span></h3>
+                    <p>Superhost • 2 years hosting</p>
+                </div>
+            </div>
+
+            <!-- Property Features -->
+            <div class="property-features">
+                <div class="feature">
+                    <span class="feature-icon">🛏️</span>
+                    <span>2 bedrooms</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🚿</span>
+                    <span>1 bathroom</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">👥</span>
+                    <span>Up to 4 guests</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">📏</span>
+                    <span>80 m²</span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="description">
+                <h3>About this place</h3>
+                <p th:text="${house.description}">
+                    Beautiful beachfront property with stunning ocean views. Perfect for families and couples looking for a relaxing getaway. The space features modern amenities and is just steps away from the beach.
+                </p>
+            </div>
+
+            <!-- Amenities -->
+            <div class="amenities">
+                <h3>What this place offers</h3>
+                <div class="amenities-grid">
+                    <div class="amenity">
+                        <span>📶</span>
+                        <span>Wifi</span>
+                    </div>
+                    <div class="amenity">
+                        <span>🍳</span>
+                        <span>Kitchen</span>
+                    </div>
+                    <div class="amenity">
+                        <span>🅿️</span>
+                        <span>Free parking</span>
+                    </div>
+                    <div class="amenity">
+                        <span>🏊</span>
+                        <span>Pool</span>
+                    </div>
+                    <div class="amenity">
+                        <span>❄️</span>
+                        <span>Air conditioning</span>
+                    </div>
+                    <div class="amenity">
+                        <span>🔥</span>
+                        <span>Heating</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="booking-card">
+                <div class="price-display">
+                    $<span th:text="${house.price}">150</span>
+                    <span class="price-per-night">per night</span>
+                </div>
+
+                <form class="booking-form" action="/api/bookings" method="post">
+                    <input type="hidden" name="houseId" th:value="${house.id}">
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div>
+                                <label>Check-in</label>
+                                <input type="date" name="checkIn" required>
+                            </div>
+                            <div>
+                                <label>Check-out</label>
+                                <input type="date" name="checkOut" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Guests</label>
+                        <select name="guests" required>
+                            <option value="1">1 guest</option>
+                            <option value="2">2 guests</option>
+                            <option value="3">3 guests</option>
+                            <option value="4">4 guests</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn-book" onclick="handleBooking()">
+                        Reserve
+                    </button>
+
+                    <button type="button" class="contact-host" onclick="contactHost()">
+                        Contact Host
+                    </button>
+                </form>
+
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>$<span th:text="${house.price}">150</span> × 3 nights</span>
+                        <span>$450</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Cleaning fee</span>
+                        <span>$25</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Service fee</span>
+                        <span>$30</span>
+                    </div>
+                    <div class="price-total">
+                        <span>Total</span>
+                        <span>$505</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <div class="reviews-header">
+            <h3>
+                <span class="star">★</span>
+                <span th:text="${house.averageRating != null and house.averageRating > 0 ? #numbers.formatDecimal(house.averageRating, 1, 1) : 'New'}">New</span>
+                <span th:if="${house.reviewCount != null and house.reviewCount > 0}">
+                        • <span th:text="${house.reviewCount}">0</span> reviews
+                    </span>
+            </h3>
+        </div>
+
+        <div class="reviews-grid" th:if="${house.reviews != null and !house.reviews.isEmpty()}">
+            <div class="review-card" th:each="review : ${house.reviews}">
+                <div class="review-header">
+                    <div class="reviewer-avatar" th:text="${review.userName != null ? review.userName.substring(0,1).toUpperCase() : 'U'}">U</div>
+                    <div>
+                        <h4 th:text="${review.userName ?: 'Anonymous'}">User</h4>
+                        <div class="review-rating">
+                            <span th:if="${review.rating >= 1}">★</span>
+                            <span th:if="${review.rating >= 2}">★</span>
+                            <span th:if="${review.rating >= 3}">★</span>
+                            <span th:if="${review.rating >= 4}">★</span>
+                            <span th:if="${review.rating >= 5}">★</span>
+                        </div>
+                    </div>
+                </div>
+                <p th:text="${review.comment ?: 'No comment provided'}">
+                    Great place with amazing views!
+                </p>
+            </div>
+        </div>
+
+        <div th:if="${house.reviews == null or house.reviews.isEmpty()}">
+            <p>No reviews yet. Be the first to review this property!</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleBooking() {
+        // Check if user is logged in
+        if (!isLoggedIn()) {
+            alert('Please log in to make a booking');
+            window.location.href = '/auth/login';
+            return;
+        }
+
+        const checkIn = document.querySelector('input[name="checkIn"]').value;
+        const checkOut = document.querySelector('input[name="checkOut"]').value;
+        const guests = document.querySelector('select[name="guests"]').value;
+
+        if (!checkIn || !checkOut) {
+            alert('Please select check-in and check-out dates');
+            return;
+        }
+
+        if (new Date(checkIn) >= new Date(checkOut)) {
+            alert('Check-out date must be after check-in date');
+            return;
+        }
+
+        // Create booking request
+        const bookingData = {
+            houseId: /*[[${house.id}]]*/ 1,
+            startDate: checkIn + 'T15:00:00',
+            endDate: checkOut + 'T11:00:00',
+            guests: parseInt(guests)
+        };
+
+        // Send booking request to API
+        fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + getAuthToken()
+            },
+            body: JSON.stringify(bookingData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success !== false) {
+                    alert('Booking request sent successfully!');
+                    window.location.href = '/user/dashboard';
+                } else {
+                    alert('Booking failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while making the booking');
+            });
+    }
+
+    function contactHost() {
+        if (!isLoggedIn()) {
+            alert('Please log in to contact the host');
+            window.location.href = '/auth/login';
+            return;
+        }
+
+        // Redirect to messaging or show contact form
+        alert('Feature coming soon! You can contact the host after making a booking.');
+    }
+
+    function isLoggedIn() {
+        return localStorage.getItem('authToken') !== null;
+    }
+
+    function getAuthToken() {
+        return localStorage.getItem('authToken');
+    }
+
+    // Update price calculation when dates change
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkInInput = document.querySelector('input[name="checkIn"]');
+        const checkOutInput = document.querySelector('input[name="checkOut"]');
+
+        function updatePriceCalculation() {
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const pricePerNight = /*[[${house.price}]]*/ 150;
+                const subtotal = nights * pricePerNight;
+                const cleaningFee = 25;
+                const serviceFee = 30;
+                const total = subtotal + cleaningFee + serviceFee;
+
+                // Update the price breakdown
+                document.querySelector('.price-breakdown').innerHTML = `
+                        <div class="price-row">
+                            <span>${pricePerNight} × ${nights} nights</span>
+                            <span>${subtotal}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Cleaning fee</span>
+                            <span>${cleaningFee}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Service fee</span>
+                            <span>${serviceFee}</span>
+                        </div>
+                        <div class="price-total">
+                            <span>Total</span>
+                            <span>${total}</span>
+                        </div>
+                    `;
+            }
+        }
+
+        checkInInput.addEventListener('change', updatePriceCalculation);
+        checkOutInput.addEventListener('change', updatePriceCalculation);
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        checkInInput.min = today;
+        checkOutInput.min = today;
+
+        // Update checkout min date when checkin changes
+        checkInInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            checkOutInput.min = selectedDate.toISOString().split('T')[0];
+        });
+    });
+</script>
 </body>
 </html>
