@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .success {
+            color: green;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>🔐 Authentication Test Page</h1>
+
+<div class="test-section">
+    <h2>1. Manual Login Test</h2>
+    <p>This bypasses the form and tests authentication directly:</p>
+
+    <input type="text" id="username" placeholder="Username" value="user">
+    <input type="password" id="password" placeholder="Password" value="user123">
+    <button onclick="testManualLogin()">Test Manual Login</button>
+
+    <div id="manualResult"></div>
+</div>
+
+<div class="test-section">
+    <h2>2. Standard Form Login</h2>
+    <p>This uses Spring Security's standard form processing:</p>
+
+    <form action="/auth/login" method="POST">
+        <input type="text" name="username" placeholder="Username" value="user" required>
+        <input type="password" name="password" placeholder="Password" value="user123" required>
+        <button type="submit">Standard Login</button>
+    </form>
+</div>
+
+<div class="test-section">
+    <h2>3. Check Current Authentication</h2>
+    <button onclick="checkAuth()">Check Auth Status</button>
+    <div id="authStatus"></div>
+</div>
+
+<div class="test-section">
+    <h2>4. Test Access to Protected Pages</h2>
+    <button onclick="testAccess('/user/dashboard')">Test User Dashboard</button>
+    <button onclick="testAccess('/host/dashboard')">Test Host Dashboard</button>
+    <button onclick="testAccess('/admin/dashboard')">Test Admin Dashboard</button>
+    <div id="accessResult"></div>
+</div>
+
+<div class="info">
+    <h3>Test Accounts:</h3>
+    <ul>
+        <li>User: user / user123</li>
+        <li>Host: host / host123</li>
+        <li>Admin: admin / admin123</li>
+    </ul>
+</div>
+
+<script>
+    function testManualLogin() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/debug/manual-login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('manualResult');
+                if (data.success) {
+                    resultDiv.innerHTML = '<div class="success">✅ ' + JSON.stringify(data, null, 2) + '</div>';
+                    if (data.redirectUrl) {
+                        resultDiv.innerHTML += '<p>You should now be able to access: <a href="' + data.redirectUrl + '">' + data.redirectUrl + '</a></p>';
+                    }
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ ' + JSON.stringify(data, null, 2) + '</div>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('manualResult').innerHTML = '<div class="error">Error: ' + error + '</div>';
+            });
+    }
+
+    function checkAuth() {
+        fetch('/auth/check')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('authStatus').innerHTML = '<pre>' + data + '</pre>';
+            });
+    }
+
+    function testAccess(url) {
+        fetch(url, {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                const resultDiv = document.getElementById('accessResult');
+                if (response.ok) {
+                    resultDiv.innerHTML = '<div class="success">✅ Access to ' + url + ' successful! <a href="' + url + '">Go there</a></div>';
+                } else if (response.status === 403) {
+                    resultDiv.innerHTML = '<div class="error">❌ Access to ' + url + ' denied (403 Forbidden)</div>';
+                } else if (response.status === 302 || response.redirected) {
+                    resultDiv.innerHTML = '<div class="error">❌ Redirected (probably to login page) - Not authenticated or insufficient permissions</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ Access to ' + url + ' failed with status: ' + response.status + '</div>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('accessResult').innerHTML = '<div class="error">Error: ' + error + '</div>';
+            });
+    }
+</script>
+</body>
+</html>

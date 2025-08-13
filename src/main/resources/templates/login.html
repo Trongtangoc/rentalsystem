@@ -4,13 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Rental System</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    <!-- Optional: Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
 
-</head>
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            color: #333;
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid #fcc;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid #cfc;
+        }
+
+        .info {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid #90caf9;
+        }
+
+        .field-error {
+            color: #c33;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .debug-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 <div class="login-container">
@@ -19,29 +142,74 @@
         <p>Welcome back! Please login to your account.</p>
     </div>
 
+    <div th:if="${param.error}" class="error">
+        Invalid username or password. Please try again.
+    </div>
+
+    <div th:if="${param.logout}" class="success">
+        You have been logged out successfully.
+    </div>
+
+    <div th:if="${param.registered}" class="success">
+        Registration successful! Please login with your credentials.
+    </div>
+
     <div th:if="${error}" class="error" th:text="${error}"></div>
     <div th:if="${success}" class="success" th:text="${success}"></div>
 
-    <form th:action="@{/auth/login}" method="post" th:object="${loginRequest}">
+    <!-- Important: Form must POST to /auth/login for Spring Security to process it -->
+    <form action="/auth/login" method="POST">
         <div class="form-group">
             <label for="username">Username:</label>
-            <input type="text" id="username" th:field="*{username}" placeholder="Enter your username"/>
-            <div th:errors="*{username}" class="field-error"></div>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus/>
         </div>
 
         <div class="form-group">
             <label for="password">Password:</label>
-            <input type="password" id="password" th:field="*{password}" placeholder="Enter your password"/>
-            <div th:errors="*{password}" class="field-error"></div>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required/>
         </div>
 
         <button type="submit" class="btn">Login</button>
     </form>
 
+    <div class="info">
+        <strong>Test Accounts:</strong><br>
+        Admin: admin / admin123<br>
+        Host: host / host123<br>
+        User: user / user123
+    </div>
+
     <div class="links">
-        <p>Don't have an account? <a th:href="@{/auth/register}">Register here</a></p>
+        <p>Don't have an account? <a href="/auth/register">Register here</a></p>
         <p><a href="/">← Back to Home</a></p>
+        <p><a href="/debug/all-users" target="_blank">Check Users (Debug)</a></p>
+    </div>
+
+    <div class="debug-info">
+        <small>
+            <strong>Debug Info:</strong><br>
+            Form action: /auth/login (POST)<br>
+            Current URL: <span id="currentUrl"></span><br>
+            <a href="/auth/check" target="_blank">Check Authentication Status</a>
+        </small>
     </div>
 </div>
+
+<script>
+    // Show current URL for debugging
+    document.getElementById('currentUrl').textContent = window.location.href;
+
+    // Log form submission for debugging
+    document.querySelector('form').addEventListener('submit', function(e) {
+        console.log('Form is being submitted to:', this.action);
+        console.log('Method:', this.method);
+        console.log('Username:', document.getElementById('username').value);
+    });
+
+    // Check if we're stuck in a loop
+    if (window.location.href.includes('error')) {
+        console.error('Login failed - check server logs');
+    }
+</script>
 </body>
 </html>
