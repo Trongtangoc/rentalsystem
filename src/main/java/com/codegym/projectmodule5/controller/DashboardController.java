@@ -1,7 +1,5 @@
 package com.codegym.projectmodule5.controller;
 
-import com.codegym.projectmodule5.service.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,19 +10,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.Collection;
 
 @Controller
-@RequiredArgsConstructor
 @Slf4j
 public class DashboardController {
 
-    private final UserService userService;
-
     @GetMapping("/dashboard")
     public String dashboard(Authentication authentication, Model model) {
-        try {
-            log.info("Dashboard accessed by user: {} with authorities: {}",
-                    authentication.getName(),
-                    authentication.getAuthorities());
+        log.info("=== Main Dashboard Access ===");
+        log.info("User: {}", authentication.getName());
+        log.info("Authorities: {}", authentication.getAuthorities());
 
+        try {
             // Get the user's authorities
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
@@ -34,21 +29,21 @@ public class DashboardController {
                 log.info("Checking role: {}", role);
 
                 if ("ROLE_ADMIN".equals(role)) {
-                    log.info("Redirecting to admin dashboard");
+                    log.info("User is ADMIN - Redirecting to admin dashboard");
                     return "redirect:/admin/dashboard";
                 }
                 if ("ROLE_HOST".equals(role)) {
-                    log.info("Redirecting to host dashboard");
+                    log.info("User is HOST - Redirecting to host dashboard");
                     return "redirect:/host/dashboard";
                 }
                 if ("ROLE_USER".equals(role)) {
-                    log.info("Redirecting to user dashboard");
+                    log.info("User is USER - Redirecting to user dashboard");
                     return "redirect:/user/dashboard";
                 }
             }
 
             // Default fallback to user dashboard
-            log.warn("No matching role found, defaulting to user dashboard");
+            log.warn("No matching role found for user: {}, defaulting to user dashboard", authentication.getName());
             return "redirect:/user/dashboard";
 
         } catch (Exception e) {

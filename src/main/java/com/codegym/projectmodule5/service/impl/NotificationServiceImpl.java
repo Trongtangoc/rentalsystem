@@ -4,6 +4,7 @@ import com.codegym.projectmodule5.dto.response.NotificationResponse;
 import com.codegym.projectmodule5.entity.Notification;
 import com.codegym.projectmodule5.entity.User;
 import com.codegym.projectmodule5.enums.NotificationType;
+import com.codegym.projectmodule5.enums.RoleEnum;
 import com.codegym.projectmodule5.exception.ResourceNotFoundException;
 import com.codegym.projectmodule5.exception.UnauthorizedException;
 import com.codegym.projectmodule5.repository.NotificationRepository;
@@ -11,6 +12,7 @@ import com.codegym.projectmodule5.repository.UserRepository;
 import com.codegym.projectmodule5.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -85,6 +88,22 @@ public class NotificationServiceImpl implements NotificationService {
                 .stream()
                 .filter(notification -> !notification.isRead())
                 .count();
+    }
+
+    @Override
+
+    public void notifyAdmins(String message) {
+        // Find all admin users
+        List<User> admins = userRepository.findAll().stream()
+                .filter(user -> user.getRole().getName() == RoleEnum.ROLE_ADMIN)
+                .collect(Collectors.toList());
+
+        // Create notification for each admin
+        for (User admin : admins) {
+            createNotification(message, NotificationType.SYSTEM, admin.getId());
+        }
+
+        log.info("Notified {} admins: {}", admins.size(), message);
     }
 
     private NotificationResponse convertToResponse(Notification notification) {

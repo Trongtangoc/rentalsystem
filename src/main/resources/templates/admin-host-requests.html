@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Registration Requests - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin-left: 1rem;
+            border-radius: 25px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #ff385c;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff385c;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .requests-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .requests-header {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .request-card {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s;
+        }
+
+        .request-card:hover {
+            background: #f8f9fa;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ff385c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-details h3 {
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .request-time {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .request-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .info-section h4 {
+            color: #333;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .reason-section {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .reason-section h4 {
+            color: #1565c0;
+            margin-bottom: 0.5rem;
+        }
+
+        .reason-text {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            color: #333;
+        }
+
+        .modal-body textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">🏠 RentalSystem Admin</a>
+        <div class="nav-links">
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/host-requests">Host Requests</a>
+            <a href="/auth/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Header with Stats -->
+    <div class="header">
+        <h1>🏡 Host Registration Requests</h1>
+        <p>Review and approve host applications</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${requests != null ? requests.size() : 0}">5</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24h</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">Approval Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests List -->
+    <div class="requests-container">
+        <div class="requests-header">
+            <h2>Pending Applications</h2>
+        </div>
+
+        <div th:if="${requests != null and !requests.empty}">
+            <div class="request-card" th:each="request : ${requests}">
+                <div class="request-header">
+                    <div class="user-info">
+                        <div class="user-avatar" th:text="${request.username.substring(0,1).toUpperCase()}">U</div>
+                        <div class="user-details">
+                            <h3 th:text="${request.username}">Username</h3>
+                            <p th:text="${request.email}">email@example.com</p>
+                        </div>
+                    </div>
+                    <div class="request-time" th:text="${request.createdAt}">2 hours ago</div>
+                </div>
+
+                <div class="request-content">
+                    <div class="info-section">
+                        <h4>Personal Information</h4>
+                        <div class="info-item">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value" th:text="${request.phoneNumber}">+84123456789</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">ID Number</span>
+                            <span class="info-value" th:text="${request.idCardNumber}">123456789</span>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h4>Address</h4>
+                        <div class="info-item">
+                            <span class="info-label">Street</span>
+                            <span class="info-value" th:text="${request.address}">123 Main St</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">City</span>
+                            <span class="info-value" th:text="${request.city}">Ho Chi Minh</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Country</span>
+                            <span class="info-value" th:text="${request.country}">Vietnam</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reason-section">
+                    <h4>Why they want to become a host:</h4>
+                    <p class="reason-text" th:text="${request.reason}">Reason text...</p>
+                </div>
+
+                <div class="reason-section" style="background: #fff3cd;">
+                    <h4 style="color: #856404;">Properties they plan to list:</h4>
+                    <p class="reason-text" th:text="${request.propertyDescription}">Property description...</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-approve"
+                            th:onclick="'approveRequest(' + ${request.id} + ')'">
+                        ✅ Approve
+                    </button>
+                    <button class="btn btn-reject"
+                            th:onclick="'showRejectModal(' + ${request.id} + ')'">
+                        ❌ Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div th:unless="${requests != null and !requests.empty}" class="empty-state">
+            <h3>No pending requests</h3>
+            <p>All host registration requests have been processed.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Reject Application</h3>
+            <p>Please provide a reason for rejection:</p>
+        </div>
+        <div class="modal-body">
+            <textarea id="rejectReason" placeholder="Enter reason for rejection..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
+            <button class="btn btn-reject" onclick="confirmReject()">Confirm Rejection</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentRequestId = null;
+
+    function approveRequest(requestId) {
+        if (confirm('Approve this host registration request?')) {
+            const notes = prompt('Add notes (optional):');
+
+            fetch(`/api/admin/host-requests/${requestId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `notes=${encodeURIComponent(notes || '')}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Request approved successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred');
+                });
+        }
+    }
+
+    function showRejectModal(requestId) {
+        currentRequestId = requestId;
+        document.getElementById('rejectModal').classList.add('show');
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').classList.remove('show');
+        document.getElementById('rejectReason').value = '';
+        currentRequestId = null;
+    }
+
+    function confirmReject() {
+        const reason = document.getElementById('rejectReason').value.trim();
+
+        if (!reason) {
+            alert('Please provide a reason for rejection');
+            return;
+        }
+
+        fetch(`/api/admin/host-requests/${currentRequestId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `reason=${encodeURIComponent(reason)}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Request rejected');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
+            });
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('rejectModal');
+        if (event.target == modal) {
+            closeRejectModal();
+        }
+    }
+</script>
+</body>
+</html>

@@ -11,4 +11,6 @@ public interface NotificationService {
     void markAsRead(Long notificationId, String username);
     void markAllAsRead(String username);
     long getUnreadCount(String username);
+
+    void notifyAdmins(String s);
 }
