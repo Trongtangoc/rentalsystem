@@ -10,8 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtResponse {
-    private String token;
+
+    @Builder.Default  // Thêm annotation này
+
+
     private String type = "Bearer";
+    private String token;
     private String username;
     private String email;
     private String role;
@@ -21,5 +25,6 @@ public class JwtResponse {
         this.username = username;
         this.email = email;
         this.role = role;
+        this.type = "Bearer";
     }
 }
