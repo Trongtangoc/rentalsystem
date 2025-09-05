@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "houses")
@@ -44,4 +45,13 @@ public class House {
 
     @OneToMany(mappedBy = "house")
     private List<Review> reviews;
+
+    public List<String> getImageUrls() {
+        if (images == null) {
+            return List.of();
+        }
+        return images.stream()
+                .map(Image::getUrl)
+                .collect(Collectors.toList());
+    }
 }

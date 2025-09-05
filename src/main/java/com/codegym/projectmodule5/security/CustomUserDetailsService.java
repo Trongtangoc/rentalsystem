@@ -1,19 +1,22 @@
-// Tạo file: src/main/java/com/codegym/projectmodule5/security/CustomUserDetailsService.java
-
 package com.codegym.projectmodule5.security;
 
 import com.codegym.projectmodule5.entity.User;
 import com.codegym.projectmodule5.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -29,6 +32,18 @@ public class CustomUserDetailsService implements UserDetailsService {
                 });
 
         log.debug("User found: {} with role: {}", user.getUsername(), user.getRole().getName());
-        return new CustomUserDetails(user);
+
+        // Create Spring Security User
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(Collections.singletonList(
+                        new SimpleGrantedAuthority(user.getRole().getName().name())
+                ))
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
+                .build();
     }
 }
