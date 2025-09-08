@@ -137,9 +137,30 @@ public class HouseServiceImpl implements HouseService {
         Sort sort = Sort.by(Sort.Direction.fromString(filter.getSortDirection()), filter.getSortBy());
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize(), sort);
 
-        Page<House> houses = houseRepository.findAll(pageable);
+        Page<House> houses;
+
+        // Nếu có filter thì dùng method có filter, không thì lấy tất cả AVAILABLE houses
+        if (filter.getLocation() != null || filter.getMinPrice() != null || filter.getMaxPrice() != null) {
+            houses = houseRepository.findHousesWithFilters(
+                    filter.getLocation(),
+                    filter.getMinPrice(),
+                    filter.getMaxPrice(),
+                    HouseStatus.AVAILABLE,
+                    pageable
+            );
+        } else {
+            houses = houseRepository.findAllByStatus(HouseStatus.AVAILABLE, pageable);
+        }
 
         return houses.map(this::convertToListItemResponse);
+    }
+
+    @Override
+    public List<HouseListItemResponse> searchHouses(String keyword) {
+        List<House> houses = houseRepository.findByKeywordAndStatus(keyword, HouseStatus.AVAILABLE);
+        return houses.stream()
+                .map(this::convertToListItemResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -153,16 +174,16 @@ public class HouseServiceImpl implements HouseService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<HouseListItemResponse> searchHouses(String keyword) {
-        List<House> allHouses = houseRepository.findAll();
-        return allHouses.stream()
-                .filter(house -> house.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
-                        house.getAddress().toLowerCase().contains(keyword.toLowerCase()) ||
-                        house.getDescription().toLowerCase().contains(keyword.toLowerCase()))
-                .map(this::convertToListItemResponse)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<HouseListItemResponse> searchHouses(String keyword) {
+//        List<House> allHouses = houseRepository.findAll();
+//        return allHouses.stream()
+//                .filter(house -> house.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+//                        house.getAddress().toLowerCase().contains(keyword.toLowerCase()) ||
+//                        house.getDescription().toLowerCase().contains(keyword.toLowerCase()))
+//                .map(this::convertToListItemResponse)
+//                .collect(Collectors.toList());
+//    }
 
     private HouseDetailResponse convertToDetailResponse(House house) {
         List<String> imageUrls = house.getImages() != null ?
