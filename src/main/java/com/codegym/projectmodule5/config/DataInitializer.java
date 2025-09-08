@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,7 +139,11 @@ public class DataInitializer implements CommandLineRunner {
             log.info("✓ Created additional USER - username: john, password: john123");
         }
     }
-    // Thay thế method initializeHousesWithImages() đơn giản hơn
+    // Fix cho DataInitializer.java - chỉ sửa method initializeHousesWithImages()
+
+    // Thay thế method initializeHousesWithImages() trong DataInitializer.java
+// Sử dụng ĐÚNG tên file có sẵn: house1.jpg, house2.jpg, house3.jpg, house4.jpg, house5.jpg, pv1.jpg, pv2.jpg, pv3.jpg
+
     private void initializeHousesWithImages() {
         log.info("=== INITIALIZING HOUSES ===");
 
@@ -160,6 +166,20 @@ public class DataInitializer implements CommandLineRunner {
                     "Penthouse cao cấp"
             };
 
+            // Sử dụng ĐÚNG tên file có sẵn
+            String[] availableImages = {
+                    "/uploads/images/house1.jpg",
+                    "/uploads/images/house2.jpg",
+                    "/uploads/images/house3.jpg",
+                    "/uploads/images/house4.jpg",
+                    "/uploads/images/house5.jpg",
+                    "/uploads/images/pv1.jpg",
+                    "/uploads/images/pv2.jpg",
+                    "/uploads/images/pv3.jpg"
+            };
+
+            log.info("Using {} available images", availableImages.length);
+
             // Check which houses don't exist yet
             List<String> existingTitles = houseRepository.findAll().stream()
                     .map(House::getTitle)
@@ -167,7 +187,7 @@ public class DataInitializer implements CommandLineRunner {
 
             int created = 0;
 
-            // House 1
+            // House 1 - Villa
             if (!existingTitles.contains(houseTitles[0])) {
                 House villa = House.builder()
                         .title(houseTitles[0])
@@ -180,14 +200,14 @@ public class DataInitializer implements CommandLineRunner {
 
                 villa = houseRepository.save(villa);
                 imageRepository.saveAll(List.of(
-                        Image.builder().url("/uploads/images/pv1.jpg").house(villa).build(),
-                        Image.builder().url("/uploads/images/pv1.jpg").house(villa).build()
+                        Image.builder().url(availableImages[0]).house(villa).build(), // house1.jpg
+                        Image.builder().url(availableImages[5]).house(villa).build()  // pv1.jpg
                 ));
-                log.info("✓ Created: {}", villa.getTitle());
+                log.info("✓ Created: {} with images: house1.jpg, pv1.jpg", villa.getTitle());
                 created++;
             }
 
-            // House 2
+            // House 2 - Apartment
             if (!existingTitles.contains(houseTitles[1])) {
                 House apartment = House.builder()
                         .title(houseTitles[1])
@@ -200,14 +220,14 @@ public class DataInitializer implements CommandLineRunner {
 
                 apartment = houseRepository.save(apartment);
                 imageRepository.saveAll(List.of(
-                        Image.builder().url("/uploads/images/p1.avif").house(apartment).build(),
-                        Image.builder().url("/uploads/images/2.webp").house(apartment).build()
+                        Image.builder().url(availableImages[1]).house(apartment).build(), // house2.jpg
+                        Image.builder().url(availableImages[6]).house(apartment).build()  // pv2.jpg
                 ));
-                log.info("✓ Created: {}", apartment.getTitle());
+                log.info("✓ Created: {} with images: house2.jpg, pv2.jpg", apartment.getTitle());
                 created++;
             }
 
-            // House 3
+            // House 3 - Townhouse
             if (!existingTitles.contains(houseTitles[2])) {
                 House townhouse = House.builder()
                         .title(houseTitles[2])
@@ -220,14 +240,14 @@ public class DataInitializer implements CommandLineRunner {
 
                 townhouse = houseRepository.save(townhouse);
                 imageRepository.saveAll(List.of(
-                        Image.builder().url("/uploads/images/p1.avif").house(townhouse).build(),
-                        Image.builder().url("/uploads/images/p1.avif").house(townhouse).build()
+                        Image.builder().url(availableImages[2]).house(townhouse).build(), // house3.jpg
+                        Image.builder().url(availableImages[7]).house(townhouse).build()  // pv3.jpg
                 ));
-                log.info("✓ Created: {}", townhouse.getTitle());
+                log.info("✓ Created: {} with images: house3.jpg, pv3.jpg", townhouse.getTitle());
                 created++;
             }
 
-            // House 4
+            // House 4 - Studio
             if (!existingTitles.contains(houseTitles[3])) {
                 House studio = House.builder()
                         .title(houseTitles[3])
@@ -240,14 +260,14 @@ public class DataInitializer implements CommandLineRunner {
 
                 studio = houseRepository.save(studio);
                 imageRepository.saveAll(List.of(
-                        Image.builder().url("/uploads/images/1.png").house(studio).build(),
-                        Image.builder().url("/uploads/images/2.webp").house(studio).build()
+                        Image.builder().url(availableImages[3]).house(studio).build(), // house4.jpg
+                        Image.builder().url(availableImages[0]).house(studio).build()  // house1.jpg (reuse)
                 ));
-                log.info("✓ Created: {}", studio.getTitle());
+                log.info("✓ Created: {} with images: house4.jpg, house1.jpg", studio.getTitle());
                 created++;
             }
 
-            // House 5
+            // House 5 - Penthouse
             if (!existingTitles.contains(houseTitles[4])) {
                 House penthouse = House.builder()
                         .title(houseTitles[4])
@@ -260,10 +280,10 @@ public class DataInitializer implements CommandLineRunner {
 
                 penthouse = houseRepository.save(penthouse);
                 imageRepository.saveAll(List.of(
-                        Image.builder().url("/uploads/images/1.png").house(penthouse).build(),
-                        Image.builder().url("/uploads/images/2.webp").house(penthouse).build()
+                        Image.builder().url(availableImages[4]).house(penthouse).build(), // house5.jpg
+                        Image.builder().url(availableImages[5]).house(penthouse).build()  // pv1.jpg (reuse)
                 ));
-                log.info("✓ Created: {}", penthouse.getTitle());
+                log.info("✓ Created: {} with images: house5.jpg, pv1.jpg", penthouse.getTitle());
                 created++;
             }
 
@@ -273,6 +293,7 @@ public class DataInitializer implements CommandLineRunner {
             log.info("   - Created: {} new houses", created);
             log.info("   - Total houses: {}", finalCount);
             log.info("   - All houses have AVAILABLE status");
+            log.info("   - Images are ready at: http://localhost:8080/uploads/images/");
 
         } catch (Exception e) {
             log.error("❌ Error creating houses: ", e);
