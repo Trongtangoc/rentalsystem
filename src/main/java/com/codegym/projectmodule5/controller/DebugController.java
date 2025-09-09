@@ -98,4 +98,6 @@ public class DebugController {
         status.put("message", "Auth endpoints available");
         return status;
     }
+
+
 }

@@ -11,7 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -136,116 +139,165 @@ public class DataInitializer implements CommandLineRunner {
             log.info("✓ Created additional USER - username: john, password: john123");
         }
     }
+    // Fix cho DataInitializer.java - chỉ sửa method initializeHousesWithImages()
+
+    // Thay thế method initializeHousesWithImages() trong DataInitializer.java
+// Sử dụng ĐÚNG tên file có sẵn: house1.jpg, house2.jpg, house3.jpg, house4.jpg, house5.jpg, pv1.jpg, pv2.jpg, pv3.jpg
 
     private void initializeHousesWithImages() {
-        log.info("Initializing sample houses with images...");
-        
-        // Get host user
-        User host = userRepository.findByUsername("host")
-                .orElseThrow(() -> new RuntimeException("Host user not found"));
+        log.info("=== INITIALIZING HOUSES ===");
 
-        // Check if houses exist, if not create them
-        if (houseRepository.count() == 0) {
-            // House 1
-            House villa = House.builder()
-                    .title("Villa sang trọng gần biển")
-                    .description("Villa 3 phòng ngủ, view biển tuyệt đẹp, đầy đủ tiện nghi cao cấp")
-                    .price(2500000.0)
-                    .address("123 Tran Phu, Nha Trang, Khanh Hoa")
-                    .status(HouseStatus.AVAILABLE)
-                    .owner(host)
-                    .build();
-            villa = houseRepository.save(villa);
+        try {
+            // Get host user
+            User host = userRepository.findByUsername("host")
+                    .orElseThrow(() -> new RuntimeException("Host user not found"));
+            log.info("✓ Found host user: {}", host.getUsername());
 
-            // Add images for villa
-            imageRepository.saveAll(List.of(
-                    Image.builder().url("/uploads/images/villa1_1.jpg").house(villa).build(),
-                    Image.builder().url("/uploads/images/villa1_2.jpg").house(villa).build()
-            ));
+            // Check current count
+            long currentHousesCount = houseRepository.count();
+            log.info("Current houses in DB: {}", currentHousesCount);
 
-            // House 2
-            House apartment = House.builder()
-                    .title("Căn hộ hiện đại trung tâm")
-                    .description("Căn hộ 2 phòng ngủ tại trung tâm Sài Gòn, gần các khu mua sắm")
-                    .price(1800000.0)
-                    .address("456 Nguyen Hue, District 1, Ho Chi Minh City")
-                    .status(HouseStatus.AVAILABLE)
-                    .owner(host)
-                    .build();
-            apartment = houseRepository.save(apartment);
+            // Define houses to create
+            String[] houseTitles = {
+                    "Villa sang trọng gần biển",
+                    "Căn hộ hiện đại trung tâm",
+                    "Nhà phố ấm cúng Hà Nội",
+                    "Studio hiện đại Đà Nẵng",
+                    "Penthouse cao cấp"
+            };
 
-            // Add images for apartment
-            imageRepository.saveAll(List.of(
-                    Image.builder().url("/uploads/images/apartment1_1.jpg").house(apartment).build(),
-                    Image.builder().url("/uploads/images/apartment1_2.jpg").house(apartment).build()
-            ));
+            // Sử dụng ĐÚNG tên file có sẵn
+            String[] availableImages = {
+                    "/uploads/images/house1.jpg",
+                    "/uploads/images/house2.jpg",
+                    "/uploads/images/house3.jpg",
+                    "/uploads/images/house4.jpg",
+                    "/uploads/images/house5.jpg",
+                    "/uploads/images/pv1.jpg",
+                    "/uploads/images/pv2.jpg",
+                    "/uploads/images/pv3.jpg"
+            };
 
-            // House 3
-            House house = House.builder()
-                    .title("Nhà phố ấm cúng Hà Nội")
-                    .description("Nhà phố 4 tầng tại Hà Nội, phù hợp cho gia đình lớn")
-                    .price(2200000.0)
-                    .address("789 Hoan Kiem, Ha Noi")
-                    .status(HouseStatus.AVAILABLE)
-                    .owner(host)
-                    .build();
-            house = houseRepository.save(house);
+            log.info("Using {} available images", availableImages.length);
 
-            // Add images for house
-            imageRepository.saveAll(List.of(
-                    Image.builder().url("/uploads/images/house1_1.jpg").house(house).build(),
-                    Image.builder().url("/uploads/images/house1_2.jpg").house(house).build()
-            ));
+            // Check which houses don't exist yet
+            List<String> existingTitles = houseRepository.findAll().stream()
+                    .map(House::getTitle)
+                    .collect(Collectors.toList());
 
-            // House 4
-            House studio = House.builder()
-                    .title("Studio hiện đại Đà Nẵng")
-                    .description("Studio nhỏ gọn, tiện nghi, gần bãi biển Mỹ Khê")
-                    .price(1200000.0)
-                    .address("321 Bach Dang, Da Nang")
-                    .status(HouseStatus.AVAILABLE)
-                    .owner(host)
-                    .build();
-            studio = houseRepository.save(studio);
+            int created = 0;
 
-            // Add images for studio
-            imageRepository.saveAll(List.of(
-                    Image.builder().url("/uploads/images/studio1_1.jpg").house(studio).build(),
-                    Image.builder().url("/uploads/images/studio1_2.jpg").house(studio).build()
-            ));
+            // House 1 - Villa
+            if (!existingTitles.contains(houseTitles[0])) {
+                House villa = House.builder()
+                        .title(houseTitles[0])
+                        .description("Villa 3 phòng ngủ, view biển tuyệt đẹp, đầy đủ tiện nghi cao cấp")
+                        .price(2500000.0)
+                        .address("123 Tran Phu, Nha Trang, Khanh Hoa")
+                        .status(HouseStatus.AVAILABLE)
+                        .owner(host)
+                        .build();
 
-            // House 5
-            House penthouse = House.builder()
-                    .title("Penthouse cao cấp")
-                    .description("Penthouse tầng cao nhất, view toàn thành phố, đầy đủ tiện nghi 5 sao")
-                    .price(5000000.0)
-                    .address("888 Nguyen Van Linh, District 7, Ho Chi Minh City")
-                    .status(HouseStatus.AVAILABLE)
-                    .owner(host)
-                    .build();
-            penthouse = houseRepository.save(penthouse);
-
-            // Add images for penthouse
-            imageRepository.saveAll(List.of(
-                    Image.builder().url("/uploads/images/penthouse1_1.jpg").house(penthouse).build(),
-                    Image.builder().url("/uploads/images/penthouse1_2.jpg").house(penthouse).build()
-            ));
-
-            log.info("✓ Created {} houses with images", 5);
-        } else {
-            // Houses exist, check if they have images
-            List<House> houses = houseRepository.findAll();
-            for (House house : houses) {
-                if (house.getImages() == null || house.getImages().isEmpty()) {
-                    // Add default images for houses without images
-                    imageRepository.saveAll(List.of(
-                            Image.builder().url("/uploads/images/1.png").house(house).build(),
-                            Image.builder().url("/uploads/images/2.webp").house(house).build()
-                    ));
-                    log.info("✓ Added images to house: {}", house.getTitle());
-                }
+                villa = houseRepository.save(villa);
+                imageRepository.saveAll(List.of(
+                        Image.builder().url(availableImages[0]).house(villa).build(), // house1.jpg
+                        Image.builder().url(availableImages[5]).house(villa).build()  // pv1.jpg
+                ));
+                log.info("✓ Created: {} with images: house1.jpg, pv1.jpg", villa.getTitle());
+                created++;
             }
-            log.info("✓ Houses already exist, verified images");
+
+            // House 2 - Apartment
+            if (!existingTitles.contains(houseTitles[1])) {
+                House apartment = House.builder()
+                        .title(houseTitles[1])
+                        .description("Căn hộ 2 phòng ngủ tại trung tâm Sài Gòn, gần các khu mua sắm")
+                        .price(1800000.0)
+                        .address("456 Nguyen Hue, District 1, Ho Chi Minh City")
+                        .status(HouseStatus.AVAILABLE)
+                        .owner(host)
+                        .build();
+
+                apartment = houseRepository.save(apartment);
+                imageRepository.saveAll(List.of(
+                        Image.builder().url(availableImages[1]).house(apartment).build(), // house2.jpg
+                        Image.builder().url(availableImages[6]).house(apartment).build()  // pv2.jpg
+                ));
+                log.info("✓ Created: {} with images: house2.jpg, pv2.jpg", apartment.getTitle());
+                created++;
+            }
+
+            // House 3 - Townhouse
+            if (!existingTitles.contains(houseTitles[2])) {
+                House townhouse = House.builder()
+                        .title(houseTitles[2])
+                        .description("Nhà phố 4 tầng tại Hà Nội, phù hợp cho gia đình lớn")
+                        .price(2200000.0)
+                        .address("789 Hoan Kiem, Ha Noi")
+                        .status(HouseStatus.AVAILABLE)
+                        .owner(host)
+                        .build();
+
+                townhouse = houseRepository.save(townhouse);
+                imageRepository.saveAll(List.of(
+                        Image.builder().url(availableImages[2]).house(townhouse).build(), // house3.jpg
+                        Image.builder().url(availableImages[7]).house(townhouse).build()  // pv3.jpg
+                ));
+                log.info("✓ Created: {} with images: house3.jpg, pv3.jpg", townhouse.getTitle());
+                created++;
+            }
+
+            // House 4 - Studio
+            if (!existingTitles.contains(houseTitles[3])) {
+                House studio = House.builder()
+                        .title(houseTitles[3])
+                        .description("Studio nhỏ gọn, tiện nghi, gần bãi biển Mỹ Khê")
+                        .price(1200000.0)
+                        .address("321 Bach Dang, Da Nang")
+                        .status(HouseStatus.AVAILABLE)
+                        .owner(host)
+                        .build();
+
+                studio = houseRepository.save(studio);
+                imageRepository.saveAll(List.of(
+                        Image.builder().url(availableImages[3]).house(studio).build(), // house4.jpg
+                        Image.builder().url(availableImages[0]).house(studio).build()  // house1.jpg (reuse)
+                ));
+                log.info("✓ Created: {} with images: house4.jpg, house1.jpg", studio.getTitle());
+                created++;
+            }
+
+            // House 5 - Penthouse
+            if (!existingTitles.contains(houseTitles[4])) {
+                House penthouse = House.builder()
+                        .title(houseTitles[4])
+                        .description("Penthouse tầng cao nhất, view toàn thành phố, đầy đủ tiện nghi 5 sao")
+                        .price(5000000.0)
+                        .address("888 Nguyen Van Linh, District 7, Ho Chi Minh City")
+                        .status(HouseStatus.AVAILABLE)
+                        .owner(host)
+                        .build();
+
+                penthouse = houseRepository.save(penthouse);
+                imageRepository.saveAll(List.of(
+                        Image.builder().url(availableImages[4]).house(penthouse).build(), // house5.jpg
+                        Image.builder().url(availableImages[5]).house(penthouse).build()  // pv1.jpg (reuse)
+                ));
+                log.info("✓ Created: {} with images: house5.jpg, pv1.jpg", penthouse.getTitle());
+                created++;
+            }
+
+            // Final result
+            long finalCount = houseRepository.count();
+            log.info("🎉 Houses initialization completed!");
+            log.info("   - Created: {} new houses", created);
+            log.info("   - Total houses: {}", finalCount);
+            log.info("   - All houses have AVAILABLE status");
+            log.info("   - Images are ready at: http://localhost:8080/uploads/images/");
+
+        } catch (Exception e) {
+            log.error("❌ Error creating houses: ", e);
+            // Don't throw exception to prevent app startup failure
         }
     }
 }
