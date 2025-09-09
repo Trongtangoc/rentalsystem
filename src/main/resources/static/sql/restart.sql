@@ -1,0 +1,16 @@
+use rentalsystem;
+SET FOREIGN_KEY_CHECKS = 0;
+SET SQL_SAFE_UPDATES = 0;
+
+DELETE FROM reviews;
+DELETE FROM bookings;
+DELETE FROM images;
+DELETE FROM houses;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Verify
+SELECT COUNT(*) FROM houses;
+SELECT COUNT(*) FROM images;
+SELECT COUNT(*) FROM bookings;
+SELECT COUNT(*) FROM reviews;
