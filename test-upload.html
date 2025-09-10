@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Upload API</title>
+</head>
+<body>
+    <h1>Test Upload API</h1>
+    
+    <form id="uploadForm">
+        <input type="file" id="fileInput" accept="image/*" multiple>
+        <button type="button" onclick="testUpload()">Test Upload</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        async function testUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            
+            if (fileInput.files.length === 0) {
+                resultDiv.innerHTML = '<p style="color: red;">Please select files</p>';
+                return;
+            }
+            
+            try {
+                resultDiv.innerHTML = '<p>Uploading...</p>';
+                
+                // Test single file upload
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch('/api/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <p style="color: green;">Success!</p>
+                        <p>File URL: ${result.fileUrl}</p>
+                        <img src="${result.fileUrl}" style="max-width: 200px; max-height: 200px;">
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${result.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -210,6 +210,19 @@
       color: #dc3545;
     }
 
+    .upload-status {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      right: 5px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 10px;
+      text-align: center;
+    }
+
     .current-images {
       margin-bottom: 1rem;
     }
@@ -454,41 +467,94 @@
 
 <script>
   let selectedImages = [];
+  let uploadedImageUrls = [];
   let removedImages = [];
 
-  function previewImages(input) {
+  async function previewImages(input) {
     const files = Array.from(input.files);
     const previewContainer = document.getElementById('imagePreview');
 
-    files.forEach((file, index) => {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
       if (file.size > 5 * 1024 * 1024) {
         alert(`File ${file.name} quá lớn. Tối đa 5MB.`);
-        return;
+        continue;
       }
 
+      // Show preview immediately
       const reader = new FileReader();
       reader.onload = function(e) {
         const imageItem = document.createElement('div');
         imageItem.className = 'image-item';
         imageItem.innerHTML = `
-                        <img src="${e.target.result}" alt="Preview">
-                        <button type="button" class="remove-image" onclick="removeImage(this, ${index})">×</button>
-                    `;
+          <img src="${e.target.result}" alt="Preview">
+          <button type="button" class="remove-image" onclick="removeImage(this, ${selectedImages.length})">×</button>
+          <div class="upload-status">Đang upload...</div>
+        `;
         previewContainer.appendChild(imageItem);
       };
       reader.readAsDataURL(file);
 
       selectedImages.push(file);
-    });
+
+      // Upload file immediately
+      try {
+        const uploadedUrl = await uploadSingleFile(file);
+        uploadedImageUrls.push(uploadedUrl);
+        
+        // Update status
+        const imageItems = previewContainer.querySelectorAll('.image-item');
+        const currentItem = imageItems[imageItems.length - 1];
+        const statusDiv = currentItem.querySelector('.upload-status');
+        if (statusDiv) {
+          statusDiv.textContent = 'Upload thành công!';
+          statusDiv.style.color = 'green';
+          setTimeout(() => statusDiv.remove(), 2000);
+        }
+      } catch (error) {
+        console.error('Upload failed:', error);
+        // Remove the preview if upload failed
+        const imageItems = previewContainer.querySelectorAll('.image-item');
+        const currentItem = imageItems[imageItems.length - 1];
+        if (currentItem) {
+          currentItem.remove();
+        }
+        selectedImages.pop();
+        alert(`Upload thất bại cho file ${file.name}: ${error.message}`);
+      }
+    }
 
     // Clear input để có thể chọn lại cùng file
     input.value = '';
     updateImageUrls();
   }
 
+  async function uploadSingleFile(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/files/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || 'Upload failed');
+    }
+
+    return result.fileUrl;
+  }
+
   function removeImage(button, index) {
     button.parentElement.remove();
     selectedImages.splice(index, 1);
+    uploadedImageUrls.splice(index, 1);
     updateImageUrls();
   }
 
@@ -500,8 +566,6 @@
   }
 
   function updateImageUrls() {
-    // In real implementation, you would upload images to server
-    // and get URLs back. For now, we'll use placeholder logic.
     const imageUrlsInput = document.getElementById('imageUrls');
 
     // Get current image URLs (for edit mode)
@@ -512,18 +576,27 @@
       }
     });
 
-    // For new images, we'll use placeholder URLs
-    // In real app, these would be uploaded via API first
-    const newImageUrls = selectedImages.map((file, index) =>
-            `/uploads/images/temp_${Date.now()}_${index}.jpg`
-    );
-
-    const allUrls = [...currentUrls, ...newImageUrls];
-    imageUrlsInput.value = JSON.stringify(allUrls);
+    // Add uploaded image URLs
+    const allUrls = [...currentUrls, ...uploadedImageUrls];
+    
+    // Clear existing hidden inputs
+    document.querySelectorAll('input[name="imageUrls"]').forEach(input => input.remove());
+    
+    // Create separate hidden input for each URL
+    allUrls.forEach((url, index) => {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'imageUrls';
+      hiddenInput.value = url;
+      document.querySelector('form').appendChild(hiddenInput);
+    });
+    
+    // Also keep the original field for Thymeleaf binding
+    imageUrlsInput.value = allUrls.join(',');
   }
 
   // Form validation
-  document.querySelector('form').addEventListener('submit', function(e) {
+  document.querySelector('form').addEventListener('submit', async function(e) {
     const title = document.getElementById('title').value.trim();
     const description = document.getElementById('description').value.trim();
     const price = document.getElementById('price').value;
@@ -538,6 +611,13 @@
     if (parseFloat(price) <= 0) {
       e.preventDefault();
       alert('Giá thuê phải lớn hơn 0!');
+      return;
+    }
+
+    // Check if there are still files being uploaded
+    if (selectedImages.length !== uploadedImageUrls.length) {
+      e.preventDefault();
+      alert('Vui lòng đợi tất cả hình ảnh được upload xong!');
       return;
     }
 

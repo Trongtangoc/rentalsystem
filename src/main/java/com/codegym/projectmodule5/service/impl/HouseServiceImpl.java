@@ -230,6 +230,12 @@ public class HouseServiceImpl implements HouseService {
         List<String> imageUrls = house.getImages() != null ?
                 house.getImages().stream().map(Image::getUrl).collect(Collectors.toList()) :
                 new ArrayList<>();
+        
+        // Clean up image URLs - handle JSON string format
+        imageUrls = imageUrls.stream()
+                .map(this::cleanImageUrl)
+                .filter(url -> url != null && !url.isEmpty())
+                .collect(Collectors.toList());
 
         double averageRating = house.getReviews() != null ?
                 house.getReviews().stream()
@@ -251,5 +257,28 @@ public class HouseServiceImpl implements HouseService {
                 .averageRating(averageRating)
                 .reviewCount(reviewCount)
                 .build();
+    }
+    
+    private String cleanImageUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return url;
+        }
+        
+        // Handle JSON array strings like [["/path"]] or ["/path"]
+        if (url.startsWith("[[") && url.endsWith("]]")) {
+            // Remove outer brackets and quotes
+            url = url.substring(2, url.length() - 2);
+            if (url.startsWith("\"") && url.endsWith("\"")) {
+                url = url.substring(1, url.length() - 1);
+            }
+        } else if (url.startsWith("[") && url.endsWith("]")) {
+            // Remove brackets and quotes
+            url = url.substring(1, url.length() - 1);
+            if (url.startsWith("\"") && url.endsWith("\"")) {
+                url = url.substring(1, url.length() - 1);
+            }
+        }
+        
+        return url;
     }
 }
