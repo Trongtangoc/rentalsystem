@@ -386,7 +386,8 @@
     <div class="dashboard-header">
         <h1>🏡 Host Dashboard</h1>
         <p>Welcome back, <span th:text="${user.username}">Host</span>! Manage your properties and bookings</p>
-        <a href="#" class="btn-primary" onclick="showAddPropertyForm()">+ Add New Property</a>
+        <a href="/host/houses/add" class="btn-primary">+ Add New Property</a>
+<!--        <a href="/host/houses/add" class="btn-primary" onclick="showAddPropertyForm()">+ Add New Property</a>-->
     </div>
 
     <!-- Stats Grid -->
@@ -417,7 +418,8 @@
     <div class="section">
         <div class="section-header">
             <h2 class="section-title">My Properties</h2>
-            <button class="btn btn-primary" onclick="showAddPropertyForm()">+ Add Property</button>
+            <a href="/host/houses/add" class="btn-primary">+ Add Property</a>
+<!--            <button class="btn btn-primary" onclick="showAddPropertyForm()"><a href="/host/houses/add">+ Add Property</a></button>-->
         </div>
 
         <div th:if="${houses != null and !houses.isEmpty()}" class="properties-grid">

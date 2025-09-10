@@ -203,7 +203,7 @@ public class DataInitializer implements CommandLineRunner {
                         Image.builder().url(availableImages[0]).house(villa).build(), // house1.jpg
                         Image.builder().url(availableImages[5]).house(villa).build()  // pv1.jpg
                 ));
-                log.info("✓ Created: {} with images: house1.jpg, pv1.jpg", villa.getTitle());
+                log.info("✓ Created: {} with images: house1.jpg, pv1.jpg, house1.jpg, house1.jpg", villa.getTitle());
                 created++;
             }
 
