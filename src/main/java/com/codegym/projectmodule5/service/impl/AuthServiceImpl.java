@@ -56,12 +56,18 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
+                .emailVerified(false) // <- rõ ràng
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(userRole)
+                .enabled(true)           // Explicitly set if desired
+                .accountExpired(false)   // Explicitly set if desired
+                .accountLocked(false)    // Explicitly set if desired
+                .credentialsExpired(false) // Explicitly set if desired
                 .build();
 
         userRepository.save(user);
+
         log.info("User {} registered successfully", request.getUsername());
     }
 
