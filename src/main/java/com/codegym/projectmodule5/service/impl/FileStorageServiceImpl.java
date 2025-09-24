@@ -2,7 +2,6 @@ package com.codegym.projectmodule5.service.impl;
 
 import com.codegym.projectmodule5.exception.CustomException;
 import com.codegym.projectmodule5.service.FileStorageService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +16,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class FileStorageServiceImpl implements FileStorageService {
 
     @Value("${file.upload-dir:uploads}")
@@ -55,18 +53,22 @@ public class FileStorageServiceImpl implements FileStorageService {
                 Files.createDirectories(uploadPath);
             }
 
+            // Create images subdirectory if it doesn't exist
+            Path imagesPath = uploadPath.resolve("images");
+            if (!Files.exists(imagesPath)) {
+                Files.createDirectories(imagesPath);
+            }
+
             // Generate unique filename
             String uniqueFilename = UUID.randomUUID().toString() + "." + fileExtension;
-            Path filePath = uploadPath.resolve(uniqueFilename);
+            Path filePath = imagesPath.resolve(uniqueFilename);
 
             // Copy file to the target location
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            log.info("File uploaded successfully: {}", uniqueFilename);
-            return "/uploads/" + uniqueFilename; // Return URL path
+            return "/uploads/images/" + uniqueFilename; // Return URL path
 
         } catch (IOException e) {
-            log.error("Error uploading file: {}", e.getMessage());
             throw new CustomException("Failed to upload file: " + e.getMessage());
         }
     }
@@ -82,17 +84,14 @@ public class FileStorageServiceImpl implements FileStorageService {
     public void deleteFile(String fileName) {
         try {
             // Extract filename from URL path
-            String actualFileName = fileName.replace("/uploads/", "");
-            Path filePath = Paths.get(uploadDir, actualFileName);
+            String actualFileName = fileName.replace("/uploads/images/", "").replace("/uploads/", "");
+            Path imagesPath = Paths.get(uploadDir, "images");
+            Path filePath = imagesPath.resolve(actualFileName);
 
             if (Files.exists(filePath)) {
                 Files.delete(filePath);
-                log.info("File deleted successfully: {}", actualFileName);
-            } else {
-                log.warn("File not found for deletion: {}", actualFileName);
             }
         } catch (IOException e) {
-            log.error("Error deleting file: {}", e.getMessage());
             throw new CustomException("Failed to delete file: " + e.getMessage());
         }
     }
@@ -100,11 +99,11 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public boolean fileExists(String fileName) {
         try {
-            String actualFileName = fileName.replace("/uploads/", "");
-            Path filePath = Paths.get(uploadDir, actualFileName);
+            String actualFileName = fileName.replace("/uploads/images/", "").replace("/uploads/", "");
+            Path imagesPath = Paths.get(uploadDir, "images");
+            Path filePath = imagesPath.resolve(actualFileName);
             return Files.exists(filePath);
         } catch (Exception e) {
-            log.error("Error checking file existence: {}", e.getMessage());
             return false;
         }
     }
