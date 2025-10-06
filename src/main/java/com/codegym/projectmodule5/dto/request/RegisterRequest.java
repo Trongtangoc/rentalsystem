@@ -25,11 +25,7 @@ public class RegisterRequest {
     private String phone;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 64, message = "Password must be 8-64 chars")
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$",
-            message = "Password must contain upper, lower, digit and special char"
-    )
+    @Size(min = 6, max = 32, message = "Password must be 6-32 characters")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

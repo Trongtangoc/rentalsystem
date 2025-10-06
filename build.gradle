@@ -56,6 +56,10 @@ dependencies {
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2'
+
+    // H2 Database for testing
+    runtimeOnly 'com.h2database:h2'
 
     // Optional: Swagger for API documentation (uncomment if needed)
     // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
